@@ -1,0 +1,4 @@
+.DS_Store
+hospital.db
+__pycache__/
+*.pyc
