@@ -345,7 +345,27 @@
         const badge = document.getElementById("badge-" + moduleId);
         badge.textContent = running.length > 0 ? "Running" : "Stopped";
         badge.className = "status-badge " + (running.length > 0 ? "status-running" : "status-stopped");
+
+        const containerIds = Array.from(
+            document.querySelectorAll(`#module-${moduleId} .container-block`)
+        ).map(el => el.querySelector(".container-status").id.replace(`cstatus-${moduleId}-`, ""));
+
+        containerIds.forEach(containerId => {
+            const el = document.getElementById(`cstatus-${moduleId}-${containerId}`);
+            if (!el) return;
+            const isRunning = running.includes(containerId);
+            el.textContent = isRunning ? "● Running" : "● Stopped";
+            el.className = "container-status " + (isRunning ? "running" : "stopped");
+        });
     }
+    // Update all module statuses on page load
+    document.addEventListener("DOMContentLoaded", () => {
+        {% for module in modules %}
+        fetch("/status/{{ module.id }}")
+            .then(r => r.json())
+            .then(data => updateStatus("{{ module.id }}", data.running));
+        {% endfor %}
+    });
 </script>
 
 </body>
