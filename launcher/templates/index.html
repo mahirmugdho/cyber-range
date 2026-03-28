@@ -272,8 +272,8 @@
                     <ul class="vuln-list">
                         {% for vuln in container.vulnerabilities %}
                         <li>
-                            <input type="checkbox" name="vulns" value="{{ vuln.id }}" id="{{ vuln.id }}-{{ module.id }}">
-                            <label class="vuln-label" for="{{ vuln.id }}-{{ module.id }}">
+                            <input type="checkbox" name="vulns" value="{{ vuln.id }}" id="{{ module.id }}-{{ container.id }}-{{ vuln.id }}">
+                            <label class="vuln-label" for="{{ module.id }}-{{ container.id }}-{{ vuln.id }}">
                                 <span class="vuln-name">{{ vuln.name }}</span>
                                 <span class="vuln-desc">{{ vuln.description }}</span>
                             </label>
