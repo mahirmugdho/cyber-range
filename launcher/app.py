@@ -28,7 +28,7 @@ def module_path(module: dict[str, Any]) -> Path:
 
 def running_containers(module: dict[str, Any]) -> list[str]:
     result = subprocess.run(
-        ["docker", "compose", "ps", "--services", "--filter", "status=running"],
+        ["docker-compose", "ps", "--services"],
         cwd=module_path(module),
         capture_output=True,
         text=True,
@@ -65,7 +65,7 @@ def launch(module_id: str) -> ResponseReturnValue:
     write_env_file(module, selected_vulns)
 
     subprocess.Popen(
-        ["docker", "compose", "up", "--build", "-d"],
+        ["docker-compose", "up", "--build", "-d"],
         cwd=module_path(module),
     )
 
@@ -79,7 +79,7 @@ def stop(module_id: str) -> ResponseReturnValue:
         return jsonify({"error": "Module not found"}), 404
 
     subprocess.Popen(
-        ["docker", "compose", "down"],
+        ["docker-compose", "down"],
         cwd=module_path(module),
     )
 
@@ -93,7 +93,7 @@ def reset(module_id: str) -> ResponseReturnValue:
         return jsonify({"error": "Module not found"}), 404
 
     subprocess.Popen(
-        ["docker", "compose", "down", "--volumes", "--remove-orphans"],
+        ["docker-compose", "down", "--volumes", "--remove-orphans"],
         cwd=module_path(module),
     )
 
