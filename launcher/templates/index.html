@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Range</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #1a1a1a;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #2f6fed;
+            color: white;
+            padding: 1.2rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header h1 {
+            font-size: 1.4rem;
+            font-weight: bold;
+            letter-spacing: 0.05em;
+        }
+
+        header span {
+            font-size: 0.85rem;
+            opacity: 0.85;
+        }
+
+        main {
+            padding: 2rem;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #666;
+            margin-bottom: 1.2rem;
+        }
+
+        .module-card {
+            background: white;
+            border: 1px solid #dde3ed;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.2rem;
+        }
+
+        .module-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #1a1a1a;
+        }
+
+        .module-description {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 0.3rem;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        .status-running {
+            background: #e6f4ea;
+            color: #2e7d32;
+        }
+
+        .status-stopped {
+            background: #f1f3f5;
+            color: #888;
+        }
+
+        .containers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .container-block {
+            border: 1px solid #dde3ed;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .container-name {
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+            color: #2f6fed;
+        }
+
+        .container-description {
+            font-size: 0.78rem;
+            color: #888;
+            margin-bottom: 0.8rem;
+        }
+
+        .container-status {
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+        }
+
+        .container-status.running {
+            color: #2e7d32;
+        }
+
+        .container-status.stopped {
+            color: #aaa;
+        }
+
+        .vuln-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .vuln-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            font-size: 0.82rem;
+        }
+
+        .vuln-list input[type="checkbox"] {
+            margin-top: 2px;
+            accent-color: #2f6fed;
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+        }
+
+        .vuln-label {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .vuln-name {
+            font-weight: bold;
+            color: #1a1a1a;
+        }
+
+        .vuln-desc {
+            color: #888;
+            font-size: 0.75rem;
+            margin-top: 1px;
+        }
+
+        .module-actions {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 0.65rem 1.4rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-launch {
+            background: #2f6fed;
+            color: white;
+        }
+
+        .btn-launch:hover {
+            background: #2560d4;
+        }
+
+        .btn-stop {
+            background: #f1f3f5;
+            color: #333;
+        }
+
+        .btn-stop:hover {
+            background: #e2e6ea;
+        }
+
+        .btn-reset {
+            background: #fff0f0;
+            color: #c0392b;
+        }
+
+        .btn-reset:hover {
+            background: #ffe0e0;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #1a1a1a;
+            color: white;
+            padding: 0.8rem 1.4rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Cyber Range</h1>
+    <span>Training Environment Control Panel</span>
+</header>
+
+<main>
+    <h2>Available Modules</h2>
+
+    {% for module in modules %}
+    <div class="module-card" id="module-{{ module.id }}">
+        <div class="module-header">
+            <div>
+                <div class="module-title">{{ module.name }}</div>
+                <div class="module-description">{{ module.description }}</div>
+            </div>
+            <div class="status-badge {% if statuses[module.id] %}status-running{% else %}status-stopped{% endif %}"
+                 id="badge-{{ module.id }}">
+                {% if statuses[module.id] %}Running{% else %}Stopped{% endif %}
+            </div>
+        </div>
+
+        <form id="form-{{ module.id }}">
+            <div class="containers-grid">
+                {% for container in module.containers %}
+                <div class="container-block">
+                    <div class="container-name">{{ container.name }}</div>
+                    <div class="container-description">{{ container.description }}</div>
+                    <div class="container-status {% if container.id in statuses[module.id] %}running{% else %}stopped{% endif %}"
+                         id="cstatus-{{ module.id }}-{{ container.id }}">
+                        {% if container.id in statuses[module.id] %}● Running{% else %}● Stopped{% endif %}
+                    </div>
+                    <ul class="vuln-list">
+                        {% for vuln in container.vulnerabilities %}
+                        <li>
+                            <input type="checkbox" name="vulns" value="{{ vuln.id }}" id="{{ vuln.id }}-{{ module.id }}">
+                            <label class="vuln-label" for="{{ vuln.id }}-{{ module.id }}">
+                                <span class="vuln-name">{{ vuln.name }}</span>
+                                <span class="vuln-desc">{{ vuln.description }}</span>
+                            </label>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="module-actions">
+                <button type="button" class="btn-launch" onclick="launchModule('{{ module.id }}')">Launch</button>
+                <button type="button" class="btn-stop" onclick="stopModule('{{ module.id }}')">Stop</button>
+                <button type="button" class="btn-reset" onclick="resetModule('{{ module.id }}')">Reset</button>
+            </div>
+        </form>
+    </div>
+    {% endfor %}
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    function showToast(msg) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 3000);
+    }
+
+    function postAction(url, moduleId, body, toastMsg) {
+        fetch(url, { method: "POST", body: body })
+            .then(r => r.json())
+            .then(() => {
+                showToast(toastMsg);
+                pollStatus(moduleId);
+            });
+    }
+
+    function launchModule(moduleId) {
+        const form = document.getElementById("form-" + moduleId);
+        const data = new FormData(form);
+        postAction("/launch/" + moduleId, moduleId, data, "Launching — this may take a moment...");
+    }
+
+    function stopModule(moduleId) {
+        postAction("/stop/" + moduleId, moduleId, null, "Stopping module...");
+    }
+
+    function resetModule(moduleId) {
+        if (!confirm("Reset will tear down all containers and wipe volumes. Continue?")) return;
+        postAction("/reset/" + moduleId, moduleId, null, "Resetting module...");
+    }
+
+    function pollStatus(moduleId) {
+        let attempts = 0;
+        const interval = setInterval(() => {
+            fetch("/status/" + moduleId)
+                .then(r => r.json())
+                .then(data => {
+                    updateStatus(moduleId, data.running);
+                    attempts++;
+                    if (attempts >= 20) clearInterval(interval);
+                });
+        }, 3000);
+    }
+
+    function updateStatus(moduleId, running) {
+        const badge = document.getElementById("badge-" + moduleId);
+        badge.textContent = running.length > 0 ? "Running" : "Stopped";
+        badge.className = "status-badge " + (running.length > 0 ? "status-running" : "status-stopped");
+    }
+</script>
+
+</body>
+</html>

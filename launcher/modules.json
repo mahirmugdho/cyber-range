@@ -1,0 +1,78 @@
+{
+  "modules": [
+    {
+      "id": "hospital",
+      "name": "Memorial General Hospital",
+      "description": "A simulated hospital network with a staff portal, patient database, and internal workstation.",
+      "path": "../hospital",
+      "containers": [
+        {
+          "id": "web-server",
+          "name": "Web / App Server",
+          "description": "The hospital staff portal. This is the attacker's entry point.",
+          "vulnerabilities": [
+            {
+              "id": "VULN_SQLI",
+              "name": "SQL Injection",
+              "description": "Login form is vulnerable to SQL injection, allowing authentication bypass."
+            },
+            {
+              "id": "VULN_DIR_TRAVERSAL",
+              "name": "Directory Traversal",
+              "description": "File endpoint allows traversal outside the web root to read arbitrary files."
+            },
+            {
+              "id": "VULN_WEAK_CREDS",
+              "name": "Weak OS Credentials",
+              "description": "Linux user accounts have trivially guessable passwords."
+            },
+            {
+              "id": "VULN_PRIV_ESC",
+              "name": "Privilege Escalation",
+              "description": "Misconfigured sudo rule allows escalation to root."
+            }
+          ]
+        },
+        {
+          "id": "db-server",
+          "name": "Database Server",
+          "description": "Internal PostgreSQL server holding patient records. Not directly reachable from outside.",
+          "vulnerabilities": [
+            {
+              "id": "VULN_WEAK_CREDS",
+              "name": "Weak Database Credentials",
+              "description": "Database password is trivially guessable."
+            },
+            {
+              "id": "VULN_EXCESSIVE_PRIVS",
+              "name": "Excessive Privileges",
+              "description": "Database user has superuser rights beyond what the application needs."
+            }
+          ]
+        },
+        {
+          "id": "workstation",
+          "name": "Nurse Workstation",
+          "description": "Internal staff workstation on the hospital network. Target for lateral movement.",
+          "vulnerabilities": [
+            {
+              "id": "VULN_WEAK_SSH",
+              "name": "Weak SSH Credentials",
+              "description": "SSH user account has a trivially guessable password."
+            },
+            {
+              "id": "VULN_SENSITIVE_FILES",
+              "name": "Sensitive Files Exposed",
+              "description": "World-readable files contain plaintext credentials and internal notes."
+            },
+            {
+              "id": "VULN_SUID",
+              "name": "SUID Misconfiguration",
+              "description": "The find binary has the SUID bit set, enabling privilege escalation to root."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
