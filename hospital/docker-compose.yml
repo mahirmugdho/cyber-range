@@ -1,0 +1,56 @@
+services:
+  web-server:
+    build: ./web-server
+    container_name: hospital-web
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_HOST=hospital-db
+      - DB_PORT=5432
+      - DB_NAME=hospital
+      - DB_USER=hospitaluser
+      - DB_PASSWORD=${DB_PASSWORD:-strongpassword}
+      - VULN_SQLI=${VULN_SQLI:-false}
+      - VULN_DIR_TRAVERSAL=${VULN_DIR_TRAVERSAL:-false}
+      - VULN_WEAK_CREDS=${VULN_WEAK_CREDS:-false}
+      - VULN_PRIV_ESC=${VULN_PRIV_ESC:-false}
+    networks:
+      - public-net
+      - internal-net
+    depends_on:
+      db-server:
+        condition: service_healthy
+
+  db-server:
+    build: ./db-server
+    container_name: hospital-db
+    environment:
+      - POSTGRES_DB=hospital
+      - POSTGRES_USER=hospitaluser
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-strongpassword}
+      - VULN_WEAK_CREDS=${VULN_WEAK_CREDS:-false}
+      - VULN_EXCESSIVE_PRIVS=${VULN_EXCESSIVE_PRIVS:-false}
+    networks:
+      - internal-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hospitaluser -d hospital"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  workstation:
+    build: ./workstation
+    container_name: hospital-ws
+    environment:
+      - VULN_WEAK_SSH=${VULN_WEAK_SSH:-false}
+      - VULN_SENSITIVE_FILES=${VULN_SENSITIVE_FILES:-false}
+      - VULN_SUID=${VULN_SUID:-false}
+    networks:
+      - internal-net
+
+networks:
+  public-net:
+    driver: bridge
+  internal-net:
+    driver: bridge
+    internal: true
