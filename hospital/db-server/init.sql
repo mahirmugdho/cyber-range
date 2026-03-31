@@ -1,3 +1,6 @@
+-- Set password explicitly to ensure it matches what the web server sends
+ALTER USER hospitaluser WITH PASSWORD 'strongpassword';
+
 -- Create tables
 CREATE TABLE IF NOT EXISTS staff (
     id SERIAL PRIMARY KEY,

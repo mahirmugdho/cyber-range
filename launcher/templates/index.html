@@ -358,13 +358,18 @@
             el.className = "container-status " + (isRunning ? "running" : "stopped");
         });
     }
-    // Update all module statuses on page load
-    document.addEventListener("DOMContentLoaded", () => {
+    // Poll all module statuses on page load and every 5 seconds
+    function refreshAllStatuses() {
         {% for module in modules %}
         fetch("/status/{{ module.id }}")
             .then(r => r.json())
             .then(data => updateStatus("{{ module.id }}", data.running));
         {% endfor %}
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        refreshAllStatuses();
+        setInterval(refreshAllStatuses, 5000);
     });
 </script>
 
