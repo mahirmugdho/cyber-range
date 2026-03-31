@@ -93,7 +93,7 @@ def reset(module_id: str) -> ResponseReturnValue:
         return jsonify({"error": "Module not found"}), 404
 
     subprocess.Popen(
-        ["docker-compose", "down", "--volumes", "--remove-orphans"],
+        ["bash", "-c", "docker-compose down --volumes --remove-orphans && docker volume prune -f"],
         cwd=module_path(module),
     )
 

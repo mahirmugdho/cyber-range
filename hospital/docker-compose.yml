@@ -15,11 +15,16 @@ services:
       - VULN_WEAK_CREDS=${VULN_WEAK_CREDS:-false}
       - VULN_PRIV_ESC=${VULN_PRIV_ESC:-false}
     networks:
-      - public-net
-      - internal-net
+      public-net:
+        aliases:
+          - hospital-web
+      internal-net:
+        aliases:
+          - hospital-web
     depends_on:
       db-server:
         condition: service_healthy
+    restart: on-failure
 
   db-server:
     build: ./db-server
