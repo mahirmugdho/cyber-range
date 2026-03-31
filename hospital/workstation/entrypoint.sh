@@ -22,4 +22,4 @@ if [ "${VULN_SUID}" = "true" ]; then
 fi
 
 # Start the SSH daemon in the foreground
-exec /usr/sbin/sshd -D
+exec /usr/sbin/sshd -D 
